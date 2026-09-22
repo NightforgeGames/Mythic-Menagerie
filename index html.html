@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Mythic Menagerie</title>
+<style>
+:root{
+  --bg:#0d1020;
+  --panel:#171b33;
+  --panel2:#202746;
+  --text:#f6f7ff;
+  --muted:#aeb6d9;
+  --accent:#9d7bff;
+  --accent2:#58e6c2;
+  --gold:#ffd166;
+  --danger:#ff6b81;
+  --good:#66f0a3;
+  --line:#30385f;
+  --shadow:0 18px 50px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:
+ radial-gradient(circle at top left,rgba(157,123,255,.18),transparent 30%),
+ radial-gradient(circle at top right,rgba(88,230,194,.10),transparent 30%),
+ var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100%}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1200px;margin:0 auto;min-height:100vh;padding:calc(14px + env(safe-area-inset-top)) 14px calc(90px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#9d7bff,#58e6c2);display:grid;place-items:center;box-shadow:0 10px 26px rgba(157,123,255,.28);font-size:26px}
+h1{font-size:1.2rem;margin:0}
+.subtitle{font-size:.78rem;color:var(--muted)}
+.resources{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pill{background:rgba(23,27,51,.85);border:1px solid var(--line);padding:8px 10px;border-radius:999px;font-weight:700;font-size:.82rem}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+.panel{background:linear-gradient(180deg,rgba(32,39,70,.94),rgba(23,27,51,.94));border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+.panel h2{margin:0 0 10px;font-size:1rem}
+.hero{position:relative;min-height:300px;overflow:hidden;background:
+ radial-gradient(circle at 70% 25%,rgba(88,230,194,.25),transparent 28%),
+ radial-gradient(circle at 30% 20%,rgba(157,123,255,.25),transparent 34%),
+ linear-gradient(180deg,#22294a,#11152b)}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:44%;background:linear-gradient(180deg,transparent,rgba(2,4,12,.72))}
+.hero-top{position:relative;z-index:2}
+.hero h2{font-size:1.25rem}
+.beast-stage{position:absolute;inset:64px 0 0;display:flex;align-items:end;justify-content:center;z-index:1}
+.beast-svg{width:min(78%,430px);filter:drop-shadow(0 16px 18px rgba(0,0,0,.35))}
+.hero-info{position:absolute;left:14px;right:14px;bottom:14px;z-index:3;display:flex;justify-content:space-between;align-items:end;gap:10px}
+.hero-name{font-size:1.35rem;font-weight:900}
+.hero-meta{font-size:.82rem;color:#d9def8}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.badge{padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:800;background:rgba(13,16,32,.74);border:1px solid rgba(255,255,255,.12)}
+.card-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.beast-card{position:relative;padding:10px;border-radius:16px;background:#14182e;border:1px solid var(--line);min-height:126px;transition:.18s transform,.18s border-color}
+.beast-card:hover{transform:translateY(-2px);border-color:#6d78b2}
+.beast-card.selected{outline:2px solid var(--accent2);border-color:transparent}
+.mini-beast{height:68px;display:grid;place-items:center;border-radius:12px;margin-bottom:7px;overflow:hidden}
+.mini-beast svg{width:82px;height:68px}
+.small-name{font-size:.82rem;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small-meta{font-size:.7rem;color:var(--muted);margin-top:2px}
+.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px}
+.tabs{display:flex;gap:6px;overflow:auto;margin:0 0 12px;padding-bottom:2px}
+.tab{border:1px solid var(--line);background:#14182e;color:var(--muted);padding:8px 11px;border-radius:12px;font-weight:800;white-space:nowrap}
+.tab.active{background:linear-gradient(135deg,var(--accent),#7255da);color:white;border-color:transparent}
+.section{display:none}
+.section.active{display:block}
+.breeding-grid{display:grid;grid-template-columns:1fr 70px 1fr;gap:10px;align-items:center}
+.parent-slot{background:#11152a;border:1px dashed #56608c;border-radius:18px;padding:12px;min-height:170px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.parent-slot svg{width:120px;height:95px}
+.heart{font-size:30px;text-align:center}
+.btn{border:none;border-radius:14px;padding:11px 14px;font-weight:900;background:linear-gradient(135deg,var(--accent),#7a5feb);color:white;box-shadow:0 8px 18px rgba(157,123,255,.22)}
+.btn.secondary{background:#252c50;border:1px solid #3b456f;box-shadow:none}
+.btn.good{background:linear-gradient(135deg,#37c991,#48dfb8);color:#071a17}
+.btn.danger{background:linear-gradient(135deg,#d74f68,#ff748a)}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.full{width:100%}
+.breed-actions{display:flex;gap:8px;margin-top:12px}
+.info-box{background:#12162b;border:1px solid var(--line);border-radius:15px;padding:11px;color:var(--muted);font-size:.82rem;line-height:1.45;margin-top:10px}
+.egg{padding:14px;border-radius:18px;background:linear-gradient(180deg,#171c37,#101429);border:1px solid var(--line);display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.egg-icon{width:60px;height:72px;border-radius:50% 50% 46% 46%;background:radial-gradient(circle at 35% 28%,#fff9,transparent 12%),linear-gradient(145deg,#9d7bff,#58e6c2);box-shadow:inset -10px -10px 20px #0002,0 8px 18px #0004;flex:0 0 auto}
+.egg-info{flex:1}
+.bar{height:8px;border-radius:999px;background:#0c1020;overflow:hidden;margin-top:7px}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0}
+.shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.shop-item{background:#12162b;border:1px solid var(--line);border-radius:16px;padding:12px}
+.shop-item .icon{font-size:28px}
+.shop-item h3{margin:4px 0;font-size:.92rem}
+.shop-item p{margin:0 0 10px;font-size:.76rem;color:var(--muted);min-height:34px}
+.quest{padding:11px;border-radius:14px;background:#12162b;border:1px solid var(--line);margin-bottom:8px}
+.quest-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.quest h3{margin:0;font-size:.85rem}
+.quest p{margin:4px 0 0;color:var(--muted);font-size:.74rem}
+.footer-note{color:var(--muted);font-size:.72rem;text-align:center;margin-top:12px}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));z-index:30;width:min(720px,calc(100% - 20px));background:rgba(17,21,42,.92);backdrop-filter:blur(16px);border:1px solid #364068;border-radius:20px;padding:7px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;box-shadow:0 18px 50px #0008}
+.nav button{background:transparent;border:0;color:var(--muted);padding:9px 4px;border-radius:13px;font-size:.72rem;font-weight:800}
+.nav button span{display:block;font-size:18px;margin-bottom:2px}
+.nav button.active{background:#292f54;color:white}
+.toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-20px);background:#12162b;border:1px solid #45517f;color:white;border-radius:13px;padding:10px 14px;z-index:99;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.modal{position:fixed;inset:0;background:#050713cc;z-index:100;display:none;place-items:center;padding:16px}
+.modal.show{display:grid}
+.modal-card{width:min(520px,100%);background:linear-gradient(180deg,#242b4e,#161a32);border:1px solid #48537e;border-radius:24px;padding:18px;box-shadow:var(--shadow);text-align:center}
+.modal-card .big{height:220px;display:grid;place-items:center}
+.modal-card svg{width:260px;height:210px}
+.modal-card h2{font-size:1.5rem;margin:4px 0}
+.rarity-Common{color:#d8dced}.rarity-Uncommon{color:#66f0a3}.rarity-Rare{color:#57a9ff}.rarity-Epic{color:#c778ff}.rarity-Legendary{color:#ffd166}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.stat{background:#101429;border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center}
+.stat b{display:block;font-size:.95rem}
+.stat small{color:var(--muted);font-size:.66rem}
+@media(max-width:820px){
+  .grid{grid-template-columns:1fr}
+  .hero{min-height:340px}
+  .card-list{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:520px){
+  .resources{gap:4px}.pill{font-size:.72rem;padding:6px 8px}
+  .card-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .breeding-grid{grid-template-columns:1fr 46px 1fr;gap:6px}
+  .parent-slot{min-height:145px;padding:7px}
+  .parent-slot svg{width:90px;height:78px}
+  .shop-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">✦</div>
+      <div><h1>Mythic Menagerie</h1><div class="subtitle">Breed. Hatch. Evolve.</div></div>
+    </div>
+    <div class="resources">
+      <div class="pill">🪙 <span id="coins">0</span></div>
+      <div class="pill">💎 <span id="gems">0</span></div>
+      <div class="pill">🏡 <span id="capacity">0/0</span></div>
+    </div>
+  </header>
+
+  <main id="homeView">
+    <div class="grid">
+      <section class="panel hero">
+        <div class="hero-top"><h2>Your Sanctuary</h2><div class="subtitle">Tap a beast below to feature it.</div></div>
+        <div class="beast-stage" id="heroArt"></div>
+        <div class="hero-info">
+          <div><div class="hero-name" id="heroName">—</div><div class="hero-meta" id="heroMeta"></div><div class="badges" id="heroBadges"></div></div>
+          <button class="btn secondary" id="renameBtn">Rename</button>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Sanctuary Beasts</h2>
+        <div class="card-list" id="beastList"></div>
+      </section>
+    </div>
+  </main>
+
+  <main id="breedView" style="display:none">
+    <section class="panel">
+      <h2>Moonwell Breeding Grove</h2>
+      <div class="tabs">
+        <button class="tab active" data-breedtab="pair">Pair</button>
+        <button class="tab" data-breedtab="eggs">Eggs <span id="eggCount"></span></button>
+        <button class="tab" data-breedtab="genes">Gene Guide</button>
+      </div>
+      <div class="section active" id="pairSection">
+        <div class="breeding-grid">
+          <div class="parent-slot" id="parentA"></div>
+          <div class="heart">💞</div>
+          <div class="parent-slot" id="parentB"></div>
+        </div>
+        <div class="breed-actions">
+          <button class="btn secondary full" id="clearParents">Clear</button>
+          <button class="btn good full" id="breedBtn">Breed • 120 🪙</button>
+        </div>
+        <div class="info-box">Offspring inherit one or both parent elements, body genes, horns, wings, markings, and stat tendencies. Rare mutations can create Epic or Legendary bloodlines.</div>
+        <h2 style="margin-top:16px">Choose Parents</h2>
+        <div class="card-list" id="breedBeastList"></div>
+      </div>
+      <div class="section" id="eggsSection"><div id="eggList"></div></div>
+      <div class="section" id="genesSection">
+        <div class="info-box">
+          <b>Genetics</b><br>
+          • Elements: Flame, Tide, Grove, Storm, Frost, Shadow, Radiance, Arcane.<br>
+          • Dominant genes decide body silhouette, tail, horns, and wings.<br>
+          • Hybrid offspring may gain dual elements.<br>
+          • Higher Bond increases the chance of rare traits.<br>
+          • Legendary mutations are intentionally uncommon.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="marketView" style="display:none">
+    <section class="panel">
+      <h2>Moonmarket</h2>
+      <div class="shop-grid" id="shopGrid"></div>
+    </section>
+  </main>
+
+  <main id="questsView" style="display:none">
+    <section class="panel">
+      <h2>Keeper Tasks</h2>
+      <div id="questList"></div>
+      <div class="info-box">Tasks refresh automatically when completed. Rewards help expand your sanctuary and speed up your breeding program.</div>
+    </section>
+  </main>
+
+  <main id="settingsView" style="display:none">
+    <section class="panel">
+      <h2>Keeper Settings</h2>
+      <div class="shop-item">
+        <h3>Save Data</h3>
+        <p>Progress saves automatically on this device.</p>
+        <button class="btn secondary full" id="exportBtn">Export Save</button>
+      </div>
+      <div class="shop-item" style="margin-top:10px">
+        <h3>Reset Sanctuary</h3>
+        <p>Start over with a fresh sanctuary and starter beasts.</p>
+        <button class="btn danger full" id="resetBtn">Reset Game</button>
+      </div>
+      <div class="footer-note">Mythic Menagerie prototype v1.0</div>
+    </section>
+  </main>
+</div>
+
+<nav class="nav">
+  <button class="active" data-view="home"><span>🏡</span>Sanctuary</button>
+  <button data-view="breed"><span>🥚</span>Breed</button>
+  <button data-view="market"><span>🛒</span>Market</button>
+  <button data-view="quests"><span>📜</span>Tasks</button>
+  <button data-view="settings"><span>⚙️</span>Settings</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="hatchModal">
+  <div class="modal-card">
+    <div class="big" id="hatchArt"></div>
+    <div class="rarity-Rare" id="hatchRarity"></div>
+    <h2 id="hatchName">New Beast!</h2>
+    <div id="hatchDetails" class="hero-meta"></div>
+    <div class="stat-grid" id="hatchStats"></div>
+    <button class="btn full" style="margin-top:14px" id="hatchClose">Welcome Home</button>
+  </div>
+</div>
+
+<script>
+const ELEMENTS = {
+  Flame:{c1:"#ff6b4a",c2:"#ffba55",icon:"🔥"},
+  Tide:{c1:"#42a5ff",c2:"#65e6ff",icon:"💧"},
+  Grove:{c1:"#38d27a",c2:"#a9e85d",icon:"🌿"},
+  Storm:{c1:"#7d72ff",c2:"#e0e8ff",icon:"⚡"},
+  Frost:{c1:"#8ad8ff",c2:"#e7fbff",icon:"❄️"},
+  Shadow:{c1:"#6d4a9d",c2:"#d05cff",icon:"🌑"},
+  Radiance:{c1:"#ffd65a",c2:"#fff3b0",icon:"☀️"},
+  Arcane:{c1:"#e265ff",c2:"#60ffd7",icon:"🔮"}
+};
+const RARITY_MULT={Common:1,Uncommon:1.12,Rare:1.28,Epic:1.52,Legendary:1.9};
+const NAMES_A=["Astra","Cinder","Moss","Nox","Luma","Vyre","Ember","Zephyr","Rune","Fable","Mist","Thorn","Halo","Drake","Nyx","Sol","Echo","Bramble","Gale","Nova"];
+const NAMES_B=["wing","fang","tail","horn","paw","mane","spark","shade","scale","whisper","bloom","claw","song","crest","heart","glint"];
+const BODY_TYPES=["wyrm","fox","gryphon","lynx","drake"];
+const TRAITS=["Crystal Horn","Moon Mark","Star Wings","Prismatic Tail","Crown Crest","Runic Fur","Void Eyes","Bloom Antlers","Thunder Mane","Aurora Scales"];
+
+function rng(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
+function chance(p){return Math.random()<p}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+
+function starter(id,name,element,body,rarity,trait){
+  return {id,name,element,element2:null,body,rarity,trait,level:1,bond:10,genes:{horn:rng(0,3),wing:rng(0,3),tail:rng(0,3),mark:rng(0,4)},stats:{power:rng(18,25),grace:rng(18,25),magic:rng(18,25)},parents:null};
+}
+const defaultState=()=>({
+  coins:850,gems:15,capacity:12,selected:null,
+  beasts:[
+    starter(uid(),"Emberfang","Flame","drake","Uncommon","Crown Crest"),
+    starter(uid(),"Mosswhisper","Grove","fox","Common","Bloom Antlers"),
+    starter(uid(),"Zephyrwing","Storm","gryphon","Rare","Star Wings"),
+    starter(uid(),"Mistpaw","Tide","lynx","Common","Moon Mark")
+  ],
+  parents:[], eggs:[], counters:{bred:0,hatched:0,bought:0}, quests:[], habitatLevel:1
+});
+let S=load();
+if(!S.selected && S.beasts[0]) S.selected=S.beasts[0].id;
+if(!S.quests || !S.quests.length) S.quests=makeQuests();
+
+function save(){localStorage.setItem("mythicMenagerieSave",JSON.stringify(S));renderHeader()}
+function load(){try{return JSON.parse(localStorage.getItem("mythicMenagerieSave"))||defaultState()}catch(e){return defaultState()}}
+
+function makeQuests(){
+  return [
+    {id:uid(),type:"breed",target:2,start:S?.counters?.bred||0,reward:180,label:"Breed 2 magical beasts"},
+    {id:uid(),type:"hatch",target:1,start:S?.counters?.hatched||0,reward:120,label:"Hatch 1 egg"},
+    {id:uid(),type:"bond",target:25,start:0,reward:2,gems:true,label:"Raise any beast to 25 Bond"}
+  ];
+}
+function progressQuest(q){
+  if(q.type==="breed") return Math.min(q.target,S.counters.bred-q.start);
+  if(q.type==="hatch") return Math.min(q.target,S.counters.hatched-q.start);
+  if(q.type==="bond") return Math.min(q.target,Math.max(...S.beasts.map(b=>b.bond||0),0));
+  return 0;
+}
+function refreshQuest(q){
+  if(q.type==="breed") return {id:uid(),type:"breed",target:rng(2,4),start:S.counters.bred,reward:rng(160,260),label:"Breed more magical beasts"};
+  if(q.type==="hatch") return {id:uid(),type:"hatch",target:rng(1,3),start:S.counters.hatched,reward:rng(120,220),label:"Hatch magical eggs"};
+  return {id:uid(),type:"bond",target:rng(30,55),start:0,reward:rng(2,4),gems:true,label:"Raise a beast's Bond"};
+}
+
+function beastSVG(b,mini=false){
+  const e=ELEMENTS[b.element]||ELEMENTS.Arcane;
+  const e2=b.element2?ELEMENTS[b.element2]:e;
+  const id="g"+b.id.replace(/[^a-z0-9]/gi,"").slice(-8)+Math.random().toString(36).slice(2,6);
+  const wing=b.genes?.wing??1, horn=b.genes?.horn??1, tail=b.genes?.tail??1, mark=b.genes?.mark??1;
+  const body=b.body||"drake";
+  let silhouette="";
+  if(body==="fox") silhouette=`
+    <path d="M88 105 C55 85 52 45 74 31 L91 50 L111 28 L124 55 C161 49 193 67 198 99 C202 129 171 151 133 146 C109 143 93 130 88 105Z"/>
+    <path d="M72 112 C42 111 25 126 35 139 C49 157 84 145 93 128Z"/>`;
+  else if(body==="gryphon") silhouette=`
+    <path d="M72 107 C58 74 82 48 116 51 C153 42 195 64 198 101 C202 136 167 151 127 147 C99 145 81 132 72 107Z"/>
+    <path d="M105 61 C73 19 39 25 43 49 C47 73 77 80 104 82Z"/>
+    <path d="M150 58 C177 22 210 33 205 55 C201 77 176 84 153 82Z"/>`;
+  else if(body==="lynx") silhouette=`
+    <path d="M77 112 C60 82 73 51 104 45 L111 24 L128 43 L149 24 L153 49 C182 56 198 78 194 106 C190 137 159 150 122 146 C98 144 84 133 77 112Z"/>
+    <path d="M87 133 C67 135 61 153 73 160 C88 169 104 151 110 141Z"/>`;
+  else if(body==="wyrm") silhouette=`
+    <path d="M58 116 C45 91 60 71 87 72 C98 38 132 35 149 55 C164 73 155 91 135 98 C166 91 202 102 204 128 C206 155 167 162 128 151 C94 143 70 139 58 116Z"/>
+    <path d="M77 76 C61 51 73 28 91 38 C102 44 99 60 94 74Z"/>`;
+  else silhouette=`
+    <path d="M72 111 C57 78 77 49 111 49 C124 29 151 30 161 52 C188 60 202 81 197 108 C191 142 154 153 116 146 C94 142 80 132 72 111Z"/>
+    <path d="M89 55 L82 28 L105 48Z"/><path d="M151 51 L166 25 L170 59Z"/>`;
+  const wings = wing>0 ? `<path d="M112 84 C78 ${64-wing*5} 42 ${52-wing*4} 37 77 C35 96 68 101 102 100Z" opacity=".78"/><path d="M153 84 C181 ${56-wing*3} 215 ${62-wing*3} 215 86 C214 103 183 104 160 100Z" opacity=".65"/>`:"";
+  const horns = horn>0 ? `<path d="M114 50 C105 ${33-horn*3} 103 ${18-horn*2} 116 ${22-horn} C127 27 122 40 124 50Z"/><path d="M149 50 C158 ${32-horn*3} 162 ${20-horn*2} 169 ${27-horn} C177 38 161 45 158 55Z"/>`:"";
+  const tails = tail>0 ? `<path d="M79 121 C45 118 26 96 38 83 C51 69 73 90 88 105 C66 84 42 70 39 51" fill="none" stroke="url(#${id})" stroke-width="${10+tail*2}" stroke-linecap="round"/>`:"";
+  const markings = `<path d="M112 88 L128 ${74-mark*2} L142 88 L130 103Z" fill="${e2.c2}" opacity=".85"/>`;
+  return `<svg viewBox="0 0 250 180" class="beast-svg" aria-label="${esc(b.name)}">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${e.c1}"/><stop offset="1" stop-color="${e2.c2}"/></linearGradient></defs>
+    <g fill="url(#${id})">${wings}${tails}${silhouette}${horns}</g>
+    ${markings}
+    <circle cx="121" cy="75" r="5" fill="#fff"/><circle cx="151" cy="75" r="5" fill="#fff"/>
+    <circle cx="122" cy="76" r="2.5" fill="#0a1020"/><circle cx="152" cy="76" r="2.5" fill="#0a1020"/>
+    <path d="M131 88 Q137 93 144 88" fill="none" stroke="#101429" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="130" cy="151" rx="58" ry="9" fill="#000" opacity=".22"/>
+  </svg>`;
+}
+function typeLabel(b){return b.element2?`${b.element} / ${b.element2}`:b.element}
+
+function renderHeader(){
+  coins.textContent=S.coins.toLocaleString();
+  gems.textContent=S.gems.toLocaleString();
+  capacity.textContent=`${S.beasts.length}/${S.capacity}`;
+}
+function renderHome(){
+  const b=S.beasts.find(x=>x.id===S.selected)||S.beasts[0];
+  if(!b){heroArt.innerHTML="";heroName.textContent="No beasts yet";return}
+  S.selected=b.id;
+  heroArt.innerHTML=beastSVG(b);
+  heroName.textContent=b.name;
+  heroMeta.textContent=`Lv. ${b.level} • ${typeLabel(b)} • Bond ${b.bond}`;
+  heroBadges.innerHTML=`<span class="badge rarity-${b.rarity}">${b.rarity}</span><span class="badge">${b.trait}</span>`;
+  beastList.innerHTML=S.beasts.map(x=>cardHTML(x,x.id===b.id)).join("");
+  beastList.querySelectorAll(".beast-card").forEach(el=>el.onclick=()=>{S.selected=el.dataset.id;save();renderHome()});
+}
+function cardHTML(b,selected=false){
+  return `<div class="beast-card ${selected?"selected":""}" data-id="${b.id}">
+    <div class="mini-beast">${beastSVG(b,true)}</div>
+    <div class="small-name">${esc(b.name)}</div>
+    <div class="small-meta">${ELEMENTS[b.element].icon} ${typeLabel(b)} • <span class="rarity-${b.rarity}">${b.rarity}</span></div>
+  </div>`;
+}
+function parentHTML(id){
+  const b=S.beasts.find(x=>x.id===id);
+  if(!b) return `<div style="font-size:30px">＋</div><div class="small-name">Choose Beast</div><div class="small-meta">Select below</div>`;
+  return `${beastSVG(b,true)}<div class="small-name">${esc(b.name)}</div><div class="small-meta">${typeLabel(b)} • Bond ${b.bond}</div>`;
+}
+function renderBreed(){
+  parentA.innerHTML=parentHTML(S.parents[0]);
+  parentB.innerHTML=parentHTML(S.parents[1]);
+  breedBeastList.innerHTML=S.beasts.map(x=>cardHTML(x,S.parents.includes(x.id))).join("");
+  breedBeastList.querySelectorAll(".beast-card").forEach(el=>el.onclick=()=>selectParent(el.dataset.id));
+  breedBtn.disabled=S.parents.length!==2 || S.coins<120 || S.beasts.length+S.eggs.length>=S.capacity;
+  eggCount.textContent=S.eggs.length?`(${S.eggs.length})`:"";
+  renderEggs();
+}
+function selectParent(id){
+  if(S.parents.includes(id)) S.parents=S.parents.filter(x=>x!==id);
+  else if(S.parents.length<2) S.parents.push(id);
+  else S.parents=[S.parents[1],id];
+  save();renderBreed();
+}
+function breed(){
+  if(S.parents.length!==2)return toastMsg("Choose two parents.");
+  if(S.coins<120)return toastMsg("Not enough coins.");
+  if(S.beasts.length+S.eggs.length>=S.capacity)return toastMsg("Sanctuary is full. Upgrade capacity.");
+  const a=S.beasts.find(x=>x.id===S.parents[0]), b=S.beasts.find(x=>x.id===S.parents[1]);
+  if(!a||!b)return;
+  S.coins-=120;
+  const duration=10000;
+  S.eggs.push({id:uid(),a:a.id,b:b.id,created:Date.now(),ready:Date.now()+duration});
+  a.bond=Math.min(100,a.bond+2);b.bond=Math.min(100,b.bond+2);
+  S.counters.bred++;
+  save();renderAll();toastMsg("A magical egg has formed!");
+}
+function rarityForParents(a,b){
+  let boost=((a.bond+b.bond)/200)*0.10;
+  let r=Math.random()+boost;
+  if(r>1.055)return "Legendary";
+  if(r>.90)return "Epic";
+  if(r>.68)return "Rare";
+  if(r>.36)return "Uncommon";
+  return "Common";
+}
+function hatchEgg(egg){
+  if(Date.now()<egg.ready)return toastMsg("This egg is still incubating.");
+  if(S.beasts.length>=S.capacity)return toastMsg("No room in the sanctuary.");
+  const a=S.beasts.find(x=>x.id===egg.a), b=S.beasts.find(x=>x.id===egg.b);
+  if(!a||!b)return;
+  const rarity=rarityForParents(a,b);
+  const dual=chance(.36);
+  const elements=[a.element,a.element2,b.element,b.element2].filter(Boolean);
+  const el1=pick(elements);
+  let el2=null;
+  if(dual){
+    const alts=elements.filter(e=>e!==el1);
+    if(alts.length)el2=pick(alts);
+    else if(chance(.12))el2=pick(Object.keys(ELEMENTS).filter(e=>e!==el1));
+  }
+  const mutationChance={Common:.03,Uncommon:.06,Rare:.1,Epic:.18,Legendary:.35}[rarity];
+  const child={
+    id:uid(),
+    name:pick(NAMES_A)+pick(NAMES_B),
+    element:el1,element2:el2,
+    body:chance(.5)?a.body:b.body,
+    rarity,
+    trait:chance(mutationChance)?pick(TRAITS):chance(.5)?a.trait:b.trait,
+    level:1,bond:5,
+    genes:{
+      horn:chance(.48)?a.genes.horn:b.genes.horn,
+      wing:chance(.48)?a.genes.wing:b.genes.wing,
+      tail:chance(.48)?a.genes.tail:b.genes.tail,
+      mark:chance(.48)?a.genes.mark:b.genes.mark
+    },
+    stats:{
+      power:Math.round(((a.stats.power+b.stats.power)/2+rng(-4,6))*RARITY_MULT[rarity]),
+      grace:Math.round(((a.stats.grace+b.stats.grace)/2+rng(-4,6))*RARITY_MULT[rarity]),
+      magic:Math.round(((a.stats.magic+b.stats.magic)/2+rng(-4,6))*RARITY_MULT[rarity])
+    },
+    parents:[a.id,b.id]
+  };
+  if(chance(mutationChance)){
+    child.body=chance(.35)?pick(BODY_TYPES):child.body;
+    const gene=pick(["horn","wing","tail","mark"]);
+    child.genes[gene]=Math.min(4,(child.genes[gene]||0)+1);
+  }
+  S.beasts.push(child);S.selected=child.id;
+  S.eggs=S.eggs.filter(x=>x.id!==egg.id);
+  S.counters.hatched++;
+  save();showHatch(child);renderAll();
+}
+function renderEggs(){
+  if(!S.eggs.length){eggList.innerHTML=`<div class="empty">No eggs incubating yet.</div>`;return}
+  eggList.innerHTML=S.eggs.map(e=>{
+    const pct=Math.min(100,Math.max(0,100-(e.ready-Date.now())/100));
+    const ready=Date.now()>=e.ready;
+    const a=S.beasts.find(x=>x.id===e.a),b=S.beasts.find(x=>x.id===e.b);
+    return `<div class="egg" data-id="${e.id}">
+      <div class="egg-icon"></div>
+      <div class="egg-info"><b>${ready?"Ready to hatch!":"Incubating..."}</b><div class="small-meta">${a?esc(a.name):"?"} × ${b?esc(b.name):"?"}</div>
+      <div class="bar"><i style="width:${pct}%"></i></div></div>
+      <button class="btn ${ready?"good":"secondary"}" ${ready?"":"disabled"}>${ready?"Hatch":"Wait"}</button>
+    </div>`;
+  }).join("");
+  eggList.querySelectorAll(".egg").forEach(el=>{
+    const e=S.eggs.find(x=>x.id===el.dataset.id);
+    el.querySelector("button").onclick=()=>hatchEgg(e);
+  });
+}
+function showHatch(b){
+  hatchArt.innerHTML=beastSVG(b);
+  hatchRarity.className="rarity-"+b.rarity;
+  hatchRarity.textContent=b.rarity.toUpperCase();
+  hatchName.textContent=b.name;
+  hatchDetails.textContent=`${typeLabel(b)} • ${b.trait}`;
+  hatchStats.innerHTML=`<div class="stat"><b>${b.stats.power}</b><small>POWER</small></div><div class="stat"><b>${b.stats.grace}</b><small>GRACE</small></div><div class="stat"><b>${b.stats.magic}</b><small>MAGIC</small></div>`;
+  hatchModal.classList.add("show");
+}
+function renderShop(){
+  const items=[
+    {icon:"🏡",name:"Habitat Expansion",desc:"+4 beast capacity",price:500,action:"capacity"},
+    {icon:"💞",name:"Bond Treat",desc:"+10 Bond to your featured beast",price:120,action:"bond"},
+    {icon:"🥚",name:"Moon Incense",desc:"Finish the oldest egg instantly",gems:3,action:"incense"},
+    {icon:"✨",name:"Arcane Seed",desc:"Add a random rare trait to featured beast",gems:5,action:"trait"}
+  ];
+  shopGrid.innerHTML=items.map((i,n)=>`<div class="shop-item"><div class="icon">${i.icon}</div><h3>${i.name}</h3><p>${i.desc}</p><button class="btn full" data-action="${i.action}">${i.price?i.price+" 🪙":i.gems+" 💎"}</button></div>`).join("");
+  shopGrid.querySelectorAll("button").forEach(b=>b.onclick=()=>buy(b.dataset.action));
+}
+function buy(action){
+  const selected=S.beasts.find(x=>x.id===S.selected);
+  if(action==="capacity"){
+    if(S.coins<500)return toastMsg("Not enough coins.");
+    S.coins-=500;S.capacity+=4;S.habitatLevel++;S.counters.bought++;toastMsg("Sanctuary expanded!");
+  }
+  if(action==="bond"){
+    if(!selected)return;
+    if(S.coins<120)return toastMsg("Not enough coins.");
+    S.coins-=120;selected.bond=Math.min(100,(selected.bond||0)+10);S.counters.bought++;toastMsg(`${selected.name}'s Bond increased.`);
+  }
+  if(action==="incense"){
+    if(!S.eggs.length)return toastMsg("No eggs to accelerate.");
+    if(S.gems<3)return toastMsg("Not enough gems.");
+    S.gems-=3;S.eggs.sort((a,b)=>a.ready-b.ready)[0].ready=Date.now();S.counters.bought++;toastMsg("An egg is ready to hatch!");
+  }
+  if(action==="trait"){
+    if(!selected)return;
+    if(S.gems<5)return toastMsg("Not enough gems.");
+    S.gems-=5;selected.trait=pick(TRAITS);S.counters.bought++;toastMsg(`${selected.name} gained ${selected.trait}!`);
+  }
+  save();renderAll();
+}
+function renderQuests(){
+  questList.innerHTML=S.quests.map(q=>{
+    const p=progressQuest(q),done=p>=q.target;
+    return `<div class="quest" data-id="${q.id}"><div class="quest-row"><div><h3>${q.label}</h3><p>${p}/${q.target} • Reward: ${q.gems?q.reward+" 💎":q.reward+" 🪙"}</p></div><button class="btn ${done?"good":"secondary"}" ${done?"":"disabled"}>${done?"Claim":"In progress"}</button></div><div class="bar"><i style="width:${Math.min(100,p/q.target*100)}%"></i></div></div>`;
+  }).join("");
+  questList.querySelectorAll(".quest").forEach(el=>{
+    el.querySelector("button").onclick=()=>claimQuest(el.dataset.id);
+  });
+}
+function claimQuest(id){
+  const q=S.quests.find(x=>x.id===id);if(!q||progressQuest(q)<q.target)return;
+  if(q.gems)S.gems+=q.reward;else S.coins+=q.reward;
+  S.quests=S.quests.map(x=>x.id===id?refreshQuest(x):x);
+  save();renderAll();toastMsg("Task reward claimed!");
+}
+function renderAll(){renderHeader();renderHome();renderBreed();renderShop();renderQuests()}
+function toastMsg(t){toast.textContent=t;toast.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>toast.classList.remove("show"),1800)}
+function showView(v){
+  ["home","breed","market","quests","settings"].forEach(x=>{
+    document.getElementById(x+"View").style.display=x===v?"block":"none";
+  });
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  if(v==="breed")renderBreed();if(v==="quests")renderQuests();
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+document.querySelectorAll("[data-breedtab]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-breedtab]").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+  ["pair","eggs","genes"].forEach(x=>document.getElementById(x+"Section").classList.toggle("active",x===b.dataset.breedtab));
+  if(b.dataset.breedtab==="eggs")renderEggs();
+});
+breedBtn.onclick=breed;
+clearParents.onclick=()=>{S.parents=[];save();renderBreed()};
+renameBtn.onclick=()=>{
+  const b=S.beasts.find(x=>x.id===S.selected);if(!b)return;
+  const n=prompt("Rename your beast:",b.name);
+  if(n&&n.trim()){b.name=n.trim().slice(0,18);save();renderHome()}
+};
+hatchClose.onclick=()=>hatchModal.classList.remove("show");
+resetBtn.onclick=()=>{
+  if(confirm("Reset all Mythic Menagerie progress?")){localStorage.removeItem("mythicMenagerieSave");S=defaultState();S.selected=S.beasts[0].id;S.quests=makeQuests();save();renderAll();showView("home");toastMsg("New sanctuary created.");}
+};
+exportBtn.onclick=async()=>{
+  const data=JSON.stringify(S,null,2);
+  try{await navigator.clipboard.writeText(data);toastMsg("Save data copied to clipboard.");}
+  catch(e){prompt("Copy your save data:",data)}
+};
+setInterval(()=>{if(document.getElementById("breedView").style.display!=="none")renderEggs()},1000);
+renderAll();
+</script>
+</body>
+</html>
